@@ -1,0 +1,184 @@
+{% extends 'layout.html' %}
+
+{% block title %}Admin{% endblock %}
+
+{% block content %}
+{% for k in status.error %}
+<div class="alert alert-danger alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+  {{ status.error[k] }}
+</div>
+{% endfor %}
+{% for k in status.success %}
+<div class="alert alert-success alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+  {{ status.success[k] }}
+</div>
+{% endfor %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title"><i class="fa fa-cogs fa-fw"></i> General settings</h4>
+      </div>
+      <div class="panel-body">
+        <form role="form" action="{{ uri_for('maze-admin-settings', maze_id=maze.key.id(), admin_key=maze.admin_key) }}" method="POST">
+          <div class="form-group">
+            <label for="maze-name" class="control-label">Maze name</label>
+            <input type="text" class="form-control" id="maze-name" name="maze-name" value="{{ maze.name_encoded }}" placeholder="My awesome maze" title="The name shows up in the page title for your maze and various other places.">
+          </div>
+          <div class="form-group">
+            <label for="maze-name" class="control-label">Your email</label>
+            <input type="email" class="form-control" id="maze-admin-email" name="maze-admin-email" value="{{ maze.admin_email }}" required>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="maze-enable-sharing"{{ 'checked="checked"' if maze.enable_sharing else '' }}> Show share buttons
+            </label>
+            <span class="help-block">Shows common sharing options (Facebook, Twitter, etc.) to the maze interface so it can be more easily shared.</span>
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title"><i class="fa fa-lock fa-fw"></i> Change password</h4>
+      </div>
+      <div class="panel-body">
+        <form role="form" action="{{ uri_for('maze-admin-password', maze_id=maze.key.id(), admin_key=maze.admin_key) }}" method="POST">
+          <div class="form-group">
+            <label for="old-password" class="control-label">Current password</label>
+            <input type="password" class="form-control" id="old-password" name="old-password">
+          </div>
+          <div class="form-group">
+            <label for="new-password" class="control-label">New password</label>
+            <input type="password" class="form-control" id="new-password" name="new-password">
+          </div>
+          <div class="form-group">
+            <label for="new-password-repeat" class="control-label">Repeat new password</label>
+            <input type="password" class="form-control" id="new-password-repeat" name="new-password-repeat">
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>{# /col #}
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title"><i class="fa fa-instagram fa-fw"></i> Instagram search settings</h4>
+      </div>
+      <div class="panel-body">
+        <form role="form" action="{{ uri_for('maze-admin-instagram', maze_id=maze.key.id(), admin_key=maze.admin_key) }}" method="POST">
+          {% if instagram_user %}
+          <div class="form-group">
+            <label>Connected user</label>
+            <div class="row">
+              <div class="col-xs-2">
+                <img class="img img-rounded img-responsive" src="{{ instagram_user.profile_picture }}">
+              </div>
+              <div class="col-xs-10">
+                {{ instagram_user.username }} &dash; {{ instagram_user.full_name }}<br>
+                {{ instagram_user.counts.get('media', 0) }} media file{{ 's' if instagram_user.counts.get('media', 0) != 1 }}
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="instagram-tag">Tag</label>
+            <input type="text" class="form-control" id="instagram-tag" name="instagram-tag" value="{{ maze.instagram.tag or '' }}" title="Only one tag is supported" placeholder="Example: lifeisgreat">
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="instagram-include-recent"{{ 'checked="checked"' if maze.instagram.include_recent else '' }}> Include your recent photos
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="instagram-include-feed"{{ 'checked="checked"' if maze.instagram.include_feed else '' }}> Include photos from feed
+            </label>
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+          {% endif %}
+          <a class="btn btn-{{ 'default' if instagram_user else 'info' }}" href="{{ uri_for('maze-admin-connect-instagram', maze_id=maze.key.id(), admin_key=maze.admin_key) }}">
+            {{ 'Re-connect your account' if instagram_user else 'Connect your account' }}
+          </a>
+        </form>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title"><i class="fa fa-flickr fa-fw"></i> Flickr search settings</h4>
+      </div>
+      <div class="panel-body">
+        <form role="form" action="{{ uri_for('maze-admin-flickr', maze_id=maze.key.id(), admin_key=maze.admin_key) }}" method="POST">
+          {% if flickr_user %}
+          <div class="form-group">
+            <label>Connected user</label>
+            <div class="row">
+              <div class="col-xs-2">
+                <img class="img img-rounded img-responsive" src="{{ flickr_user.buddyiconurl }}">
+              </div>
+              <div class="col-xs-10">
+                {{ flickr_user.username }} &dash; {{ flickr_user.realname }}<br>
+                {{ flickr_user.photos_info.count }} photo{{ 's' if flickr_user.photos_info.count != 0 }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="form-group">
+            <label for="flickr-tags">Tags</label>
+            <input type="text" class="form-control" id="flickr-tags" name="flickr-tags" value="{{ maze.flickr.tags or '' }}" title="Separate tags with commas" placeholder="Example: lifeisgreat,indeed">
+          </div>
+          <div class="form-group">
+            <label for="flickr-user">User</label>
+            <input type="text" class="form-control" id="flickr-user" name="flickr-user" value="{{ maze.flickr.user or '' }}" title="One user ID or username" placeholder="Example: dlebech or 31813931@N03">
+          </div>
+          {% if flickr_user %}
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="flickr-include-recent"{{ 'checked="checked"' if maze.flickr.include_recent else '' }}> Include your recent photos
+            </label>
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" name="flickr-include-favs"{{ 'checked="checked"' if maze.flickr.include_favs else '' }}> Include your favorites
+            </label>
+          </div>
+          {% endif %}
+          <button type="submit" class="btn btn-primary">Save</button>
+          {% if not flickr_user %}
+          <a class="btn btn-info" href="{{ uri_for('maze-admin-connect-flickr', maze_id=maze.key.id(), admin_key=maze.admin_key) }}">Connect your account</a>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+    {#
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title"><i class="fa fa-facebook fa-fw"></i> Facebook search settings</h4>
+      </div>
+      <div class="panel-body">
+        <form role="form" action="{{ uri_for('maze-admin-facebook', maze_id=maze.key.id(), admin_key=maze.admin_key) }}" method="POST">
+          {% if facebook_user %}
+          <div class="form-group">
+            <label>Connected user</label>
+            <div class="row">
+              <div class="col-xs-2">
+                <img class="img img-rounded img-responsive" src="{{ facebook_user.picture.data.url }}">
+              </div>
+              <div class="col-xs-10">
+                {{ facebook_user.name }}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          {% if not facebook_user %}
+          <a class="btn btn-info" href="{{ uri_for('maze-admin-connect-facebook', maze_id=maze.key.id(), admin_key=maze.admin_key) }}">Connect your account</a>
+          {% endif %}
+        </form>
+      </div>
+    </div>{# /panel #}
+  </div>{# /col #}
+</div>{# /row #}
+{% endblock %}

@@ -1,0 +1,78 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+
+builtins:
+- deferred: on
+- appstats: on
+- remote_api: on
+
+inbound_services:
+- mail
+
+env_variables:
+  AUTH_PEPPER: 'pepperpepper'
+  SESSION_KEY: 'key'
+  SESSION_COOKIE: '_session'
+  NO_REPLY_EMAIL: 'noreply@myapp.appspotmail.com'
+  INSTAGRAM_CLIENT_ID: ''
+  INSTAGRAM_CLIENT_SECRET: ''
+  FLICKR_API_KEY: ''
+  FLICKR_API_SECRET: ''
+  FACEBOOK_APP_ID: ''
+  FACEBOOK_APP_SECRET: ''
+  FACEBOOK_SHARE_BUTTON: 'yes'
+  GOOGLE_PLUS_SHARE_BUTTON: 'yes'
+  TWITTER_SHARE_BUTTON: 'yes'
+
+handlers:
+- url: /robots\.txt
+  static_files: static/robots.txt
+  upload: static/robots.txt
+
+- url: /favicon\.ico
+  static_files: static/favicon.ico
+  upload: static/favicon.ico
+
+- url: /js
+  static_dir: static/js/dist
+
+- url: /css
+  static_dir: static/css/dist
+
+- url: /img
+  static_dir: static/img
+
+- url: /fonts
+  static_dir: static/fonts
+
+- url: /_ah/mail/.+
+  script: photoamaze.app
+  login: admin
+
+- url: /.*
+  script: photoamaze.app
+  secure: always
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
+
+- name: jinja2
+  version: "2.6"
+
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- ^(.*/)?.*\.bak$
+- ^(.*/)?.*\.less$
+- ^(.*/)?.*\.sh$
+- ^(.*/)?.*\.swp$
+- ^(.*/)?gulpfile.js$
+- ^(.*/)?package.json$
+- ^(.*/)?test/.*$
+- ^(.*/)?node_modules/.*$
+- ^(.*/)?docs/.*$

@@ -1,0 +1,77 @@
+@import "base.less";
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0 0 35px;
+}
+
+p {
+    margin: 0 0 25px;
+    line-height: 1.5;
+}
+
+@media(min-width:767px) {
+    p {
+        margin: 0 0 35px;
+        font-size: 20px;
+        line-height: 1.6;
+    }
+}
+
+.content-section {
+    padding-top: 100px;
+}
+
+.fillscreen {
+    display: table;
+    width: 100%;
+    height: auto;
+    padding: 100px 0;
+    color: @light;
+    background-color: @dark;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    .fillscreen-body {
+        display: table-cell;
+        vertical-align: middle;
+        .brand-heading {
+            font-size: 40px;
+        }
+
+        .intro-text {
+            font-size: 18px;
+        }
+    }
+}
+
+@media(min-width:767px) {
+    .fillscreen {
+        height: 100%;
+        padding: 0;
+        .fillscreen-body {
+            .brand-heading {
+                font-size: 100px;
+            }
+
+            .intro-text {
+                font-size: 25px;
+            }
+        }
+    }
+}
+
+.intro {
+    background: url(/img/intro_s.jpg) no-repeat center bottom scroll;
+}
+
+@media(min-width:767px) {
+    .intro {
+        background: url(/img/intro_l.jpg) no-repeat center bottom scroll;
+    }
+}

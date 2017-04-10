@@ -1,0 +1,6 @@
+flickr_api_dlebech==0.6
+httplib2==0.10.3
+oauth==1.0.1
+python-instagram-ext==1.3.9
+simplejson==3.10.0
+six==1.10.0

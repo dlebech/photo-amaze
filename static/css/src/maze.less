@@ -1,0 +1,71 @@
+@import "grayscale/variables.less";
+
+body {
+    font-family: "Lora","Helvetica Neue",Helvetica,Arial,sans-serif;
+    margin: 0;
+    overflow: hidden;
+    color: #fff;
+    font-size: 16px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-transform: uppercase;
+    font-family: "Montserrat","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+u {
+    text-decoration: underline;
+}
+
+#overlay { 
+    position: fixed; 
+    z-index: 70;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    overflow: auto;
+}
+
+/*
+#copyright-list a {
+    color: #fff;
+}
+*/
+
+#menu {
+    position: fixed;
+    z-index: 1000;
+    left: 12px;
+    bottom: 12px;
+    background: none;
+    font-size: 2.5em;
+}
+
+#menu div {
+    display: inline-block;
+    text-align: center;
+}
+
+.link {
+    cursor: pointer;
+}
+
+#sharing .link {
+    font-size: 2.5em;
+    display: inline-block;
+    text-align: center;
+    background-color: none;
+    cursor: pointer;
+}
+
+#webgl-warning {
+    color: #ff0000;
+    background-color: #000000;
+}

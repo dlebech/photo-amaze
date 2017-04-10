@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Photo Amaze</title>
+<meta name="description" content="Walk through your photos and images in a 3D maze.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet">
+<link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+<link href="/css/landing.css" rel="stylesheet">
+</head>
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+  <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <i class="fa fa-bars"></i>
+        </button>
+        <a class="navbar-brand page-scroll" href="#page-top"><i class="fa fa-cube"></i> Photo Amaze</a>
+      </div>
+
+      <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+        <ul class="nav navbar-nav">
+          <!-- Hidden li included to remove active class from about link when scrolled up past about section -->
+          <li class="hidden">
+            <a href="#page-top"></a>
+          </li>
+          <li>
+            <a class="page-scroll" href="#about">About</a>
+          </li>
+          <li>
+            <a class="page-scroll" href="#create">Create</a>
+          </li>
+          <li>
+            <a class="page-scroll" href="#faq">FAQ</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="fillscreen intro">
+    <div class="fillscreen-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2 text-center">
+            <h1 class="brand-heading">Photo A<u>maze</u></h1>
+            <p class="intro-text">Walk amongst your photos.</p>
+            <a href="#about" class="btn btn-circle page-scroll">
+              <i class="fa fa-angle-double-down animated"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="about" class="fillscreen">
+    <div class="fillscreen-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3 text-center">
+            <h2>A maze of pictures</h2>
+            <p>Photo Amaze is a different way of viewing your pictures.</p>
+            <p>Presented in a 3D maze, you can take a walk through the photos with the touch of a finger or a flick of the keyboard.</p>
+            <p>Create your very own and unique maze or explore the result of a public image search on Flickr.</p>
+            <ul class="list-inline">
+              <li>
+                <a href="#create" class="btn btn-default btn-lg page-scroll">
+                  <i class="fa fa-thumbs-o-up fa-fw"></i> I want one
+                </a>
+              </li>
+              <li>
+                <a rel="nofollow" href="{{ uri_for('public-maze') }}?ft=mila&amp;fu=dlebech" class="btn btn-lg btn-default">
+                  <i class="fa fa-eye fa-fw"></i> Show an example
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="create" class="fillscreen">
+    <div class="fillscreen-body">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+            <h2 class="text-center">Create a maze</h2>
+            <div id="create-choice" class="panel-group">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#create-choice" href="#public">Based on public photos</a>
+                  </h4>
+                </div>
+                <div id="public" class="panel-collapse collapse{{ ' in' if private_error is not defined else '' }}">
+                  <div class="panel-body">
+                    <p>Create a maze from photos that are publicly shared on Flickr.</p>
+                    {% if public_error is defined %}
+                    <div class="alert alert-danger">{{ public_error }}</div>
+                    {% endif %}
+                    <form role="form" method="POST">
+                      <input type="hidden" name="maze-type" value="public">
+                      <div class="form-group">
+                        <label for="flickr-user" class="sr-only">Flickr user, e.g. dlebech</label>
+                        <div class="input-group input-group-lg">
+                          <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+                          <input type="text" class="form-control" id="flickr-user" name="flickr-user" placeholder="Flickr user (example: dlebech)" value="{{ params.get('flickr-user', '') }}" title="One username or user ID.">
+                        </div>
+                        <span class="help-block">Leave this blank to search for all users.</span>
+                      </div>
+                      <div class="form-group">
+                        <label for="flickr-tags" class="sr-only">Flickr tags, e.g. puppy</label>
+                        <div class="input-group input-group-lg">
+                          <span class="input-group-addon"><i class="fa fa-flickr fa-fw"></i></span>
+                          <input type="text" class="form-control" id="flickr-tags" name="flickr-tags" placeholder="Flickr tags (example: puppy)" value="{{ params.get('flickr-tags', '') }}" title="Separate tags with commas.">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <button class="btn btn-default btn-lg" type="submit">Create</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#create-choice" href="#private">Based on private photos</a>
+                  </h4>
+                </div>
+                <div id="private" class="panel-collapse collapse{{ ' in active' if private_error is defined else '' }}">
+                  <div class="panel-body">
+                    <p>Create your own, unique maze and walk your photos. Connect with your Instagram or Flickr account later.</p>
+                    {% if private_error is defined %}
+                    <div class="alert alert-danger">{{ private_error }}</div>
+                    {% endif %}
+                    <form role="form" method="POST">
+                      <input type="hidden" name="maze-type" value="private">
+                      <div class="form-group">
+                        <label for="maze-email" class="sr-only">Your email</label>
+                        <div class="input-group input-group-lg">
+                          <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
+                          <input type="email" class="form-control" id="maze-email" name="maze-email" placeholder="Your email" required>
+                        </div>
+                        <span class="help-block">A unique admin url is sent to this email address.</span>
+                      </div>
+                      <div class="form-group">
+                        <label for="maze-password" class="sr-only">Maze password (optional)</label>
+                        <div class="input-group input-group-lg">
+                          <span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
+                          <input type="password" class="form-control" id="maze-password" name="maze-password" placeholder="Maze password (optional)">
+                        </div>
+                      </div>
+                      <button class="btn btn-default btn-lg" type="submit">Create</button>
+                      <span class="help-block">By creating a maze, you automatically approve of the <a href="{{ uri_for('terms') }}">terms</a>.</span>
+                    </form>
+                  </div>
+                </div>
+              </div>{# /panel #}
+            </div>{# /panel-group #}
+          </div>{# /col #}
+        </div>{# /row #}
+      </div>{# /container #}
+    </div>{# /fillscreen-body #}
+  </section>
+
+  <section id="faq" class="container content-section">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <h2 class="text-center">Questions and answers</h2>
+        <h4 class="text-center">Will this work on my phone?</h4>
+        <p class="text-justify">Yes, but you will get a better experience on a laptop/desktop computer.</p>
+        <h4 class="text-center">What browsers are supported?</h4>
+        <p class="text-justify">Any browser that supports WebGL should work great. Photo Amaze has been tested in the newest Chrome, Firefox and Opera as well as Internet Explorer 11.</p>
+        <h4 class="text-center">Why do you need my email address?</h4>
+        <p class="text-justify">So we can send you an email with a unique administration url where you can change the settings of your maze. We will not share your email with anyone else.</p>
+      </div>
+    </div>
+  </section>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://cdn.polyfill.io/v2/polyfill.js?features=es6"></script>
+<script src="/js/libs/jquery.easing.min.js"></script>
+<script src="/js/libs/grayscale.js"></script>
+<script src="/js/site.js"></script>
+{% if public_error is defined or private_error is defined %}
+<script>
+(function($) {
+    $(document).ready(function() {
+        $('html, body').stop().animate({
+            scrollTop: $('#create').offset().top
+        }, 1500, 'easeOutExpo');
+        setTimeout(function() {
+            $('.alert')
+                .css('-webkit-animation', 'pulse 600ms linear 0s 2')
+                .css('-moz-animation', 'pulse 600ms linear 0s 2')
+                .css('animation', 'pulse 600ms linear 0s 2');
+        }, 1500);
+    });
+})(window.jQuery);
+</script>
+{% endif %}
+
+{% set include_social = True %}
+{% include 'footer.html' %}
+
+</body>
+</html>

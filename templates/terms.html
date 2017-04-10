@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block title %}Terms and conditions{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-12">
+    <h1>Terms and conditions</h1>
+    <p>By using Photo Amaze, you automatically agree to these terms. Let's keep it simple though...</p>
+    <h3>In general</h3>
+    <p>Please do:</p>
+    <ul>
+      <li>Have fun.</li>
+      <li>Be nice.</li>
+    </ul>
+    <p>Please do <em>not</em>:</p>
+    <ul>
+      <li>Create an unreasonable amount of private mazes.</li>
+    </ul>
+    <h3>Data retention and deletion</h3>
+    <p>Photo Amaze will <em>never</em> delete photos or change your data on third party sites such as Flickr or Instagram. We only fetch the photos, we do not update them.</p>
+    <p>We reserve the right to, at our sole discretion, delete any maze at any time and for any reason.</p>
+    <p>Do not think of your maze as a permanent photo album. There are many other services that offer this functionality.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% set include_social = True %}
+{% include 'footer.html' %}
+{% endblock %}

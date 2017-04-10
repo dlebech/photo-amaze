@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %}Photo Maze login{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body text-center">
+                <h1><i class="fa fa-sign-in"></i> Login</h1>
+                {% if maze.name %}
+                <p>{{ maze.name_encoded }}</p>
+                {% endif %}
+                {% if error is defined %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                <form role="form" method="POST">
+                    <input type="hidden" name="referrer" value="{{ params.get('referrer') or '' }}">
+                    <div class="form-group">
+                        <label for="password" class="sr-only">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Get me in there</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

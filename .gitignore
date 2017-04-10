@@ -1,0 +1,13 @@
+# Ignore compiled Python files
+*.py[co]
+
+# Ignore the app.yaml, because secrets
+app.yaml
+
+# Ignore site confirmation
+googled*
+
+# Other dev stuff
+node_modules/
+dist/
+venv/

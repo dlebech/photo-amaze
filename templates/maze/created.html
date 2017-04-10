@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block title %}Created{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h1>Success!</h1>
+        <p>You created a Photo Amaze maze. You should receive an email shortly with a link to your maze and how to change the settings for your maze.</p>
+        <p>The maze is pretty empty right now but if you want, you can view the empty maze <a href="{{ uri_for('maze', maze_id=maze.key.id()) }}">here</a>.</p>
+    </div>
+</div>
+{% endblock %}

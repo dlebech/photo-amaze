@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{ name }}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="/css/maze.css">
+</head>
+<body>
+<div id="overlay">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-3 col-md-6 text-center">
+                <h1>Photo Amaze!</h1>
+                <button id="start" type="button" class="btn btn-default btn-lg">Start playing</button>
+                <div id="webgl-warning" style="display:none;"><strong>Warning!</strong> You are not using WebGL.<br>The maze might look weird and performance might be bad. Try with newest Chrome or Firefox.</div>
+                <div id="controls">
+                    <h2>Controls</h2>
+                    <p><strong>Touchscreen</strong>: Touch to move forward and look around. To only look around, touch closer to the edge of the screen.</p>
+                    <p><strong>Keyboard</strong>: Use the arrow keys or <kbd>WASD</kbd> to move forward, backward, left and right. Press <kbd>Escape</kbd> key to return to this screen.</p>
+                    <p><strong>Mouse (optional)</strong>: If you want a little more fine-grained control, you can enable the mouse to look around.</p>
+                    <p><button id="toggle-mouse" type="button" class="btn btn-default">Enable mouse</button></p>
+                </div>
+                {% if enable_sharing %}
+                <div id="sharing">
+                    <h2>Share this maze</h2>
+                    <div class="link" data-url="https://www.facebook.com/sharer.php?u={{ share_url }}"><i class="fa fa-facebook-square fa-fw"></i></div>
+                    <div class="link" data-url="https://twitter.com/share?text=Check+out+my+Photo+Amaze&url={{ share_url }}"><i class="fa fa-twitter-square fa-fw"></i></div>
+                    <div class="link" data-url="https://plus.google.com/share?url={{ share_url }}"><i class="fa fa-google-plus-square fa-fw"></i></div>
+                </div>
+                {% endif %}
+                <div id="copyright" style="display:none;">
+                    <h2>Amazing photos</h2>
+                    <p>This particular maze features the following photos:</p>
+                    <div id="copyright-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="menu">
+    <div id="settings-link" class="link"><i class="fa fa-bars fa-fw"></i></div>
+    <div id="menu-items" style="display:none;">
+        <div id="settings-minimap" class="link"><i class="fa fa-map-marker fa-fw"></i></div>
+        <div id="settings-stats" class="link"><i class="fa fa-bar-chart fa-fw"></i></div>
+        {% if enable_sharing %}
+        <div id="settings-share" class="link"><i class="fa fa-share-square-o fa-fw"></i></div>
+        {% endif %}
+        <div id="settings-controls" class="link"><i class="fa fa-keyboard-o fa-fw"></i></div>
+        <div id="settings-copyright" class="link"><i class="fa fa-copyright fa-fw"></i></div>
+    </div>
+</div>
+<div id="render-area"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r84/three.min.js"></script>
+<script src="/js/libs/stats.min.js"></script>
+<script>
+{% if enable_sharing %}
+window.enableSharing = true;
+{% endif %}
+
+{% if maze_id is defined %}
+window.imagesUrl = '{{ uri_for("maze-image-list", maze_id=maze_id) }}';
+window.imagesParams = { size: window.innerWidth };
+{% else %}
+window.imagesUrl = '{{ uri_for("public-image-list") }}';
+window.imagesParams = {
+  size: window.innerWidth,
+  it: '{{ params.get('it') or '' }}',
+  ft: '{{ params.get('ft') or '' }}',
+  fu: '{{ params.get('fu') or '' }}'
+};
+{% endif %}
+</script>
+<script src="/js/photoamaze.js"></script>
+</body>
+</html>
