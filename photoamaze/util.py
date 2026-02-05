@@ -35,9 +35,9 @@ class _ReadOnlyMetaClass(type):
         return self.__name__.lower()
 
 
-class ReadOnly(object):
+class ReadOnly(object, metaclass=_ReadOnlyMetaClass):
     """A class where all class attributes are read-only."""
-    __metaclass__ = _ReadOnlyMetaClass
+    pass
 
 
 _html_escape_table = {

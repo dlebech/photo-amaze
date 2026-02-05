@@ -1,4 +1,4 @@
-const PhotoMaze = require('./photomaze');
+import PhotoMaze from './photomaze';
 
 // Initially empty image list.
 let images = [];

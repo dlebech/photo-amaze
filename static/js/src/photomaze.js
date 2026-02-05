@@ -1,8 +1,8 @@
 /* global THREE, Stats */
 
-const Maze = require('./maze');
-const Player = require('./player');
-const MiniMap = require('./minimap');
+import Maze from './maze';
+import Player from './player';
+import MiniMap from './minimap';
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -537,4 +537,4 @@ class PhotoMaze {
   }
 }
 
-module.exports = PhotoMaze;
+export default PhotoMaze;

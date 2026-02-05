@@ -8,9 +8,11 @@
     :license: MIT, see LICENSE for details
 
 """
+import secrets
+
 from google.appengine.ext import ndb
 from google.appengine.api import memcache
-from webapp2_extras import security
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from photoamaze.config import PEPPER
 from photoamaze.util import html_escape, ReadOnly
@@ -19,9 +21,8 @@ from photoamaze.util import html_escape, ReadOnly
 class LocalImage(object):
     def __init__(self, url, message, attribution='', external_url='',
                  license=''):
-        self.url = url if isinstance(url, basestring) else str(url)
-        self.message = message if isinstance(message,
-                                             basestring) else str(message)
+        self.url = url if isinstance(url, str) else str(url)
+        self.message = message if isinstance(message, str) else str(message)
         self.attribution = attribution
         self.external_url = external_url
         self.license = license
@@ -43,9 +44,7 @@ class LocalImage(object):
 
 
 class MazeCacheKey(ReadOnly):
-    instagram_user = '{}:instagram_user'
     flickr_user = '{}:flickr_user'
-    facebook_user = '{}:facebook_user'
     image_list = '{}:imagelist'
 
 
@@ -82,40 +81,6 @@ class FlickrUserAccess(ndb.Model):
         return cls.get_by_id(user_id)
 
 
-class OAuthUserAccess(ndb.Model):
-    """Represents a single user's oauth access to some service."""
-    access_token = ndb.TextProperty()
-
-    @classmethod
-    def create_or_update(cls, user_id, access_token):
-        """Creates or updates Instagram access for the given user."""
-        user_id = str(user_id)
-        access = cls.get_or_insert(user_id)
-        access.access_token = access_token
-        return access.put()
-
-    @classmethod
-    def get_by_user_id(cls, user_id):
-        user_id = str(user_id)
-        return cls.get_by_id(user_id)
-
-
-class InstagramUserAccess(OAuthUserAccess):
-    """Represents a single user's access to Instagram. This is stored in a
-    central location so it can be used in several different maze configurations.
-
-    """
-    pass
-
-
-class FacebookUserAccess(OAuthUserAccess):
-    """Represents a single user's access to Facebook. This is stored in a
-    central location so it can be used in several different maze configurations.
-
-    """
-    pass
-
-
 class FlickrSettings(ndb.Model):
     """Represents Flickr settings for a specific maze."""
     user_access = ndb.KeyProperty(FlickrUserAccess)
@@ -128,25 +93,6 @@ class FlickrSettings(ndb.Model):
 
     # Whether or not to include user's own favorites.
     include_favs = ndb.BooleanProperty(default=False)
-
-
-class InstagramSettings(ndb.Model):
-    """Represents Instagram settings for a specific maze."""
-    user_access = ndb.KeyProperty(InstagramUserAccess)
-
-    tag = ndb.TextProperty()
-
-    # Whether or not to include the user's activity feed
-    include_feed = ndb.BooleanProperty(default=False)
-
-    # Whether or not to include the user's recent media
-    include_recent = ndb.BooleanProperty(default=False)
-
-
-class FacebookSettings(ndb.Model):
-    user_access = ndb.KeyProperty(FacebookUserAccess)
-
-    include_photos_of_you = ndb.BooleanProperty(default=False)
 
 
 class Maze(BaseModel):
@@ -163,12 +109,6 @@ class Maze(BaseModel):
     # Flickr settings
     flickr = ndb.StructuredProperty(FlickrSettings, indexed=False)
 
-    # Instragram settings
-    instagram = ndb.StructuredProperty(InstagramSettings, indexed=False)
-
-    # Facebook settings
-    facebook = ndb.StructuredProperty(FacebookSettings, indexed=False)
-
     # Whether or not to show share buttons on the photo maze.
     enable_sharing = ndb.BooleanProperty(default=False, indexed=False)
 
@@ -182,12 +122,12 @@ class Maze(BaseModel):
     @ndb.transactional
     def create(cls, email, name='', password=''):
         """Creates a new maze with a unique string ID."""
-        admin_key = security.generate_random_string(entropy=128)
+        admin_key = secrets.token_urlsafe(32)
 
         # Make sure to avoid ID collisions.
         maze = True
         while maze:
-            maze_id = security.generate_random_string(entropy=128)
+            maze_id = secrets.token_urlsafe(32)
             maze = cls.get_by_id(maze_id)
 
         # Create the maze with the non-colliding Maze ID.
@@ -197,28 +137,31 @@ class Maze(BaseModel):
                    admin_key=admin_key)
         maze.set_password(password, save=False)
         maze.flickr = FlickrSettings()
-        maze.instagram = InstagramSettings()
-        maze.facebook = FacebookSettings()
         return maze.put()
 
     def set_password(self, password, save=True):
         if password:
-            h = security.generate_password_hash(password,
-                                                method='sha512',
-                                                length=64,
-                                                pepper=PEPPER)
-            hashval, method, salt = h.split('$')
-            self.password = hashval
-            self.hash_method = method
-            self.salt = salt
+            peppered = PEPPER + password if PEPPER else password
+            h = generate_password_hash(peppered, method='pbkdf2:sha256')
+            self.password = h
+            self.hash_method = 'pbkdf2:sha256'
+            self.salt = ''
             if save:
                 self.put()
 
     def validate_password(self, password):
         if not self.password:
             return True
-        pwhash = '$'.join([self.password, self.hash_method, self.salt])
-        return security.check_password_hash(password, pwhash, pepper=PEPPER)
+        peppered = PEPPER + password if PEPPER else password
+        # Support legacy format from webapp2_extras.security
+        if self.salt:
+            legacy_hash = '$'.join([self.password, self.hash_method, self.salt])
+            # Try werkzeug format first, fall back to legacy
+            try:
+                return check_password_hash(self.password, peppered)
+            except Exception:
+                return False
+        return check_password_hash(self.password, peppered)
 
     def delete_cache(self):
         for cache_key in MazeCacheKey.values:

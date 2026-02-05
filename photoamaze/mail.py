@@ -1,6 +1,6 @@
 """
-    config
-    ======
+    mail
+    ====
 
     Mail module. For various mails. No i18n. Maybe later.
 
@@ -10,20 +10,23 @@
 """
 import logging
 
-import webapp2
+from flask import Blueprint, request
 from google.appengine.api import mail
 
 from photoamaze import config
 
+bp = Blueprint('mail', __name__)
 
-class MailHandler(webapp2.RequestHandler):
-    def post(self, *args, **kwargs):
-        msg = mail.InboundEmailMessage(self.request.body)
-        logging.info('Mail from: {}'.format(msg.sender))
-        logging.info('Subject: {}'.format(msg.subject))
-        for content_type, body in msg.bodies():
-            logging.info(content_type)
-            logging.info(body.decode())
+
+@bp.route('/_ah/mail/<address>', methods=['POST'])
+def handle_mail(address):
+    msg = mail.InboundEmailMessage(request.data)
+    logging.info('Mail from: {}'.format(msg.sender))
+    logging.info('Subject: {}'.format(msg.subject))
+    for content_type, body in msg.bodies():
+        logging.info(content_type)
+        logging.info(body.decode())
+    return '', 200
 
 
 def send_welcome(admin_email, maze_url, admin_url):

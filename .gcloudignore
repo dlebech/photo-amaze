@@ -1,0 +1,37 @@
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud. It follows the same syntax as .gitignore.
+
+.gcloudignore
+.git
+.gitignore
+
+# Python
+*.pyc
+*.pyo
+__pycache__/
+
+# Editor/temp files
+*~
+#*#
+*.bak
+*.swp
+
+# Hidden files
+.*
+
+# Build/dev files
+*.less
+*.sh
+gulpfile.js
+vite.config.js
+package.json
+package-lock.json
+node_modules/
+
+# Other
+test/
+docs/
+data/
+static/css/src
+static/js/src
+.claude/

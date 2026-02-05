@@ -96,4 +96,4 @@ class Maze {
   }
 }
 
-module.exports = Maze;
+export default Maze;

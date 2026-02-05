@@ -91,4 +91,4 @@ class MiniMap {
   }
 }
 
-module.exports = MiniMap;
+export default MiniMap;

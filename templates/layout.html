@@ -28,7 +28,7 @@
       <ul class="nav navbar-nav">
         {% if maze is defined %}
         <li>
-          <a href="{{ uri_for('maze', maze_id=maze.key.id()) }}">View maze</a>
+          <a href="{{ url_for('main.maze', maze_id=maze.key.id()) }}">View maze</a>
         </li>
         {% endif %}
       </ul>
@@ -36,7 +36,7 @@
       <ul class="nav navbar-nav navbar-right">
         {% if is_admin %}
         <li>
-          <a href="{{ uri_for('maze-admin', maze_id=maze.key.id(), admin_key=maze.admin_key) }}">Admin</a>
+          <a href="{{ url_for('main.maze_admin', maze_id=maze.key.id(), admin_key=maze.admin_key) }}">Admin</a>
         </li>
         {% endif %}
       </ul>
@@ -58,7 +58,6 @@
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="https://cdn.polyfill.io/v2/polyfill.js?features=es6"></script>
 <script>
   window.formStatus = {{ status.to_json() }};
 </script>

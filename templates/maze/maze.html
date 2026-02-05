@@ -28,9 +28,7 @@
                 {% if enable_sharing %}
                 <div id="sharing">
                     <h2>Share this maze</h2>
-                    <div class="link" data-url="https://www.facebook.com/sharer.php?u={{ share_url }}"><i class="fa fa-facebook-square fa-fw"></i></div>
                     <div class="link" data-url="https://twitter.com/share?text=Check+out+my+Photo+Amaze&url={{ share_url }}"><i class="fa fa-twitter-square fa-fw"></i></div>
-                    <div class="link" data-url="https://plus.google.com/share?url={{ share_url }}"><i class="fa fa-google-plus-square fa-fw"></i></div>
                 </div>
                 {% endif %}
                 <div id="copyright" style="display:none;">
@@ -64,13 +62,12 @@ window.enableSharing = true;
 {% endif %}
 
 {% if maze_id is defined %}
-window.imagesUrl = '{{ uri_for("maze-image-list", maze_id=maze_id) }}';
+window.imagesUrl = '{{ url_for("main.maze_image_list", maze_id=maze_id) }}';
 window.imagesParams = { size: window.innerWidth };
 {% else %}
-window.imagesUrl = '{{ uri_for("public-image-list") }}';
+window.imagesUrl = '{{ url_for("main.public_image_list") }}';
 window.imagesParams = {
   size: window.innerWidth,
-  it: '{{ params.get('it') or '' }}',
   ft: '{{ params.get('ft') or '' }}',
   fu: '{{ params.get('fu') or '' }}'
 };

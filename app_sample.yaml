@@ -1,13 +1,7 @@
-runtime: python27
-api_version: 1
-threadsafe: true
+runtime: python314
+app_engine_apis: true
 automatic_scaling:
   max_instances: 1
-
-builtins:
-- deferred: on
-- appstats: on
-- remote_api: on
 
 inbound_services:
 - mail
@@ -17,14 +11,8 @@ env_variables:
   SESSION_KEY: 'key'
   SESSION_COOKIE: '_session'
   NO_REPLY_EMAIL: 'noreply@myapp.appspotmail.com'
-  INSTAGRAM_CLIENT_ID: ''
-  INSTAGRAM_CLIENT_SECRET: ''
   FLICKR_API_KEY: ''
   FLICKR_API_SECRET: ''
-  FACEBOOK_APP_ID: ''
-  FACEBOOK_APP_SECRET: ''
-  FACEBOOK_SHARE_BUTTON: 'yes'
-  GOOGLE_PLUS_SHARE_BUTTON: 'yes'
   TWITTER_SHARE_BUTTON: 'yes'
 
 handlers:
@@ -49,32 +37,10 @@ handlers:
   static_dir: static/fonts
 
 - url: /_ah/mail/.+
-  script: photoamaze.app
+  script: auto
   login: admin
 
 - url: /.*
-  script: photoamaze.app
+  script: auto
   secure: always
 
-libraries:
-- name: webapp2
-  version: "2.5.2"
-
-- name: jinja2
-  version: "2.6"
-
-skip_files:
-- ^(.*/)?#.*#$
-- ^(.*/)?.*~$
-- ^(.*/)?.*\.py[co]$
-- ^(.*/)?.*/RCS/.*$
-- ^(.*/)?\..*$
-- ^(.*/)?.*\.bak$
-- ^(.*/)?.*\.less$
-- ^(.*/)?.*\.sh$
-- ^(.*/)?.*\.swp$
-- ^(.*/)?gulpfile.js$
-- ^(.*/)?package.json$
-- ^(.*/)?test/.*$
-- ^(.*/)?node_modules/.*$
-- ^(.*/)?docs/.*$
