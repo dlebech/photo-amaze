@@ -109,8 +109,6 @@ class Maze(BaseModel):
     # Flickr settings
     flickr = ndb.StructuredProperty(FlickrSettings, indexed=False)
 
-    # Whether or not to show share buttons on the photo maze.
-    enable_sharing = ndb.BooleanProperty(default=False, indexed=False)
 
     @property
     def name_encoded(self):

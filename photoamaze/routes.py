@@ -14,7 +14,6 @@ import base64
 import logging
 import mimetypes
 import traceback
-from urllib.parse import quote
 from functools import wraps
 
 import flickr_api
@@ -268,8 +267,6 @@ def public_maze():
     name = ' | '.join((flickr_tags, flickr_user))
     return prepare_response('maze/maze.html',
                             name=util.html_escape(name),
-                            enable_sharing=True,
-                            share_url=quote(request.url),
                             public=True)
 
 
@@ -358,9 +355,7 @@ def maze(maze_id, maze=None):
     return prepare_response('maze/maze.html',
                             maze=maze,
                             maze_id=maze.key.id(),
-                            name=maze.name or 'A Photo Maze',
-                            enable_sharing=maze.enable_sharing,
-                            share_url=quote(request.url))
+                            name=maze.name or 'A Photo Maze')
 
 
 @bp.route('/maze/<maze_id>/texture/<image_key>')
@@ -421,7 +416,6 @@ def maze_admin_settings(maze_id, admin_key, maze=None):
     status = util.html_status()
     maze.name = request.form.get('maze-name')
     maze.admin_email = request.form.get('maze-admin-email')
-    maze.enable_sharing = bool(request.form.get('maze-enable-sharing'))
     maze.put()
     status.success[''] = 'Settings updated'
     return _prepare_admin_page(maze, status=status)
@@ -460,6 +454,22 @@ def maze_admin_flickr(maze_id, admin_key, maze=None):
     memcache.delete(models.MazeCacheKey.image_list.format(maze.key.id()))
     status.success[''] = 'Flickr settings updated'
     return _prepare_admin_page(maze, status=status)
+
+
+@bp.route('/maze/<maze_id>/admin/<admin_key>/delete', methods=['POST'])
+@maze_admin_required
+def maze_admin_delete(maze_id, admin_key, maze=None):
+    maze_images = models.MazeImage.query(ancestor=maze.key).fetch()
+
+    for img in maze_images:
+        if img.image_key:
+            blobstore.delete(img.image_key)
+        img.key.delete()
+
+    maze.delete_cache()
+    maze.key.delete()
+
+    return redirect(url_for('main.landing'))
 
 
 @bp.route('/maze/<maze_id>/admin/<admin_key>/connect/flickr')

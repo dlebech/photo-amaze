@@ -25,12 +25,6 @@
                     <p><strong>Mouse (optional)</strong>: If you want a little more fine-grained control, you can enable the mouse to look around.</p>
                     <p><button id="toggle-mouse" type="button" class="btn btn-default">Enable mouse</button></p>
                 </div>
-                {% if enable_sharing %}
-                <div id="sharing">
-                    <h2>Share this maze</h2>
-                    <div class="link" data-url="https://twitter.com/share?text=Check+out+my+Photo+Amaze&url={{ share_url }}"><i class="fa fa-twitter-square fa-fw"></i></div>
-                </div>
-                {% endif %}
                 <div id="copyright" style="display:none;">
                     <h2>Amazing photos</h2>
                     <p>This particular maze features the following photos:</p>
@@ -45,9 +39,6 @@
     <div id="menu-items" style="display:none;">
         <div id="settings-minimap" class="link"><i class="fa fa-map-marker fa-fw"></i></div>
         <div id="settings-stats" class="link"><i class="fa fa-bar-chart fa-fw"></i></div>
-        {% if enable_sharing %}
-        <div id="settings-share" class="link"><i class="fa fa-share-square-o fa-fw"></i></div>
-        {% endif %}
         <div id="settings-controls" class="link"><i class="fa fa-keyboard-o fa-fw"></i></div>
         <div id="settings-copyright" class="link"><i class="fa fa-copyright fa-fw"></i></div>
     </div>
@@ -57,10 +48,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/threejs/r84/three.min.js"></script>
 <script src="/js/libs/stats.min.js"></script>
 <script>
-{% if enable_sharing %}
-window.enableSharing = true;
-{% endif %}
-
 {% if maze_id is defined %}
 window.imagesUrl = '{{ url_for("main.maze_image_list", maze_id=maze_id) }}';
 window.imagesParams = { size: window.innerWidth };

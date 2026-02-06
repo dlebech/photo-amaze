@@ -13,7 +13,6 @@ env_variables:
   NO_REPLY_EMAIL: 'noreply@myapp.appspotmail.com'
   FLICKR_API_KEY: ''
   FLICKR_API_SECRET: ''
-  TWITTER_SHARE_BUTTON: 'yes'
 
 handlers:
 - url: /robots\.txt

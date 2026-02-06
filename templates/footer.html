@@ -1,22 +1,6 @@
-{% set show_twitter = config.Twitter.share_button %}
-
 <footer id="footer">
   <div class="container text-center">
     <hr>
     <div>Created by <a href="//davidlebech.com">David Volquartz Lebech</a> &bull; <a href="{{ url_for('main.credits') }}">Credits</a> &bull; <a href="{{ url_for('main.privacy') }}">Privacy Policy</a> &bull; <a href="{{ url_for('main.terms') }}">Terms</a></div>
-    {% if include_social %}
-    <div class="buttons">
-      {% if show_twitter %}
-      <div><a href="https://twitter.com/share" class="twitter-share-button" data-url="https://photo-amaze.appspot.com" data-count="none">Tweet</a></div>
-      {% endif %}
-    </div>
-    {% endif %}
   </div>
 </footer>
-
-{% if include_social %}
-
-{% if show_twitter %}
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-{% endif %}
-{% endif %}

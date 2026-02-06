@@ -38,6 +38,6 @@ In 2017, it was updated to use slightly fancier JS syntax and updated
 some other deprecated code, as well as move hardcoded API secrets into
 environment variables.
 
-In 2025, it was migrated from Python 2.7/webapp2 to Python 3/Flask,
+In 2026, it was migrated from Python 2.7/webapp2 to Python 3/Flask,
 the build pipeline was updated from gulp/webpack to Vite, and dead
 Instagram/Facebook integrations were removed.

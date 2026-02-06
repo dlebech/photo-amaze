@@ -31,12 +31,6 @@
             <label for="maze-name" class="control-label">Your email</label>
             <input type="email" class="form-control" id="maze-admin-email" name="maze-admin-email" value="{{ maze.admin_email }}" required>
           </div>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" name="maze-enable-sharing"{{ 'checked="checked"' if maze.enable_sharing else '' }}> Show share buttons
-            </label>
-            <span class="help-block">Shows common sharing options (Twitter, etc.) to the maze interface so it can be more easily shared.</span>
-          </div>
           <button type="submit" class="btn btn-primary">Save</button>
         </form>
       </div>
@@ -60,6 +54,17 @@
             <input type="password" class="form-control" id="new-password-repeat" name="new-password-repeat">
           </div>
           <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h4 class="panel-title"><i class="fa fa-trash fa-fw"></i> Delete maze</h4>
+      </div>
+      <div class="panel-body">
+        <p>Permanently delete this maze, all its images and settings. This action cannot be undone.</p>
+        <form action="{{ url_for('main.maze_admin_delete', maze_id=maze.key.id(), admin_key=maze.admin_key) }}" method="POST">
+          <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this maze? This action cannot be undone.')">Delete maze</button>
         </form>
       </div>
     </div>
