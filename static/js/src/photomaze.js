@@ -224,6 +224,89 @@ const updateMaze = (elapsed) => {
 };
 
 /**
+ * Creates a large sky dome with a zenith-to-horizon gradient.
+ */
+const createSkyDome = () => {
+  const skyGeo = new THREE.SphereGeometry(5000, 32, 15);
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms: {},
+    vertexShader: `
+      varying vec3 vWorldPosition;
+      void main() {
+        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPos.xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vWorldPosition;
+      void main() {
+        float h = normalize(vWorldPosition).y;
+        vec3 zenith = vec3(0.0, 0.467, 1.0);   // 0x0077ff
+        vec3 horizon = vec3(0.667, 0.8, 1.0);   // 0xaaccff
+        vec3 color = mix(horizon, zenith, max(h, 0.0));
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `,
+  });
+
+  const skyDome = new THREE.Mesh(skyGeo, skyMat);
+  // Center dome over the maze floor
+  const width = maze.mazeGrid.length * wallWidth;
+  skyDome.position.set(
+    (width / 2) - wallHalfWidth,
+    0,
+    (width / 2) - wallHalfWidth,
+  );
+  scene.add(skyDome);
+};
+
+/**
+ * Creates visual markers at the maze exit: green floor tile, point light,
+ * and two flanking posts.
+ */
+const createExitMarker = () => {
+  const exitX = maze.exitCol * wallWidth;
+  const exitZ = maze.exitRow * wallWidth;
+
+  // Green floor tile slightly above the floor to avoid z-fighting
+  const tileGeo = new THREE.PlaneGeometry(wallWidth * 0.9, wallWidth * 0.9);
+  tileGeo.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+  const tileMat = new THREE.MeshPhongMaterial({
+    color: 0x00ff88,
+    emissive: 0x00ff88,
+    emissiveIntensity: 0.4,
+  });
+  const tile = new THREE.Mesh(tileGeo, tileMat);
+  tile.position.set(exitX, -wallHalfHeight + 0.5, exitZ);
+  scene.add(tile);
+
+  // Green point light as a visible beacon
+  const exitLight = new THREE.PointLight(0x00ff88, 1500, 200);
+  exitLight.position.set(exitX, wallHalfHeight, exitZ);
+  scene.add(exitLight);
+
+  // Two small posts flanking the exit opening on the south edge
+  const postGeo = new THREE.BoxGeometry(5, wallHeight, 5);
+  const postMat = new THREE.MeshPhongMaterial({
+    color: 0x00ff88,
+    emissive: 0x00ff88,
+    emissiveIntensity: 0.6,
+  });
+
+  const southZ = exitZ + wallHalfWidth;
+
+  const postLeft = new THREE.Mesh(postGeo, postMat);
+  postLeft.position.set(exitX - wallHalfWidth, 0, southZ);
+  scene.add(postLeft);
+
+  const postRight = new THREE.Mesh(postGeo, postMat);
+  postRight.position.set(exitX + wallHalfWidth, 0, southZ);
+  scene.add(postRight);
+};
+
+/**
  * Initializes a 3D version of the maze, including a player-controllable
  * character.
  */
@@ -255,13 +338,23 @@ const init3DMaze = () => {
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set((width / 2) - wallHalfWidth, -wallHalfHeight, (width / 2) - wallHalfWidth);
   scene.add(mesh);
+
+  // Ambient light for uniform wall illumination
+  scene.add(new THREE.AmbientLight(0xffffff, 2));
+
+  // Fog fades distant walls into the sky color
+  scene.fog = new THREE.FogExp2(0xaaccff, 0.0008);
+
+  createSkyDome();
+  createExitMarker();
 };
 
 const initScene = (renderAreaId) => {
   // Autostart clock.
   clock = new THREE.Clock(true);
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+  scene.background = new THREE.Color(0xaaccff);
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);

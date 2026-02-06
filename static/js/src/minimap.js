@@ -59,6 +59,9 @@ class MiniMap {
       }
     }
 
+    // Draw exit marker.
+    this.drawExit();
+
     // Draw the current position.
     this.drawPosition(this.curRow, this.curCol, 'blue', this.wallLength / 4);
 
@@ -72,6 +75,11 @@ class MiniMap {
 
     // Draw over previous position.
     this.drawPosition(this.curRow, this.curCol, 'white', this.wallLength / 3);
+
+    // Redraw exit marker if the previous position was the exit cell.
+    if (this.curRow === this.maze.exitRow && this.curCol === this.maze.exitCol) {
+      this.drawExit();
+    }
 
     this.curRow = curRow;
     this.curCol = curCol;
@@ -88,6 +96,20 @@ class MiniMap {
     const y = (row * this.wallLength) + (this.wallLength / 2);
     context.arc(x, y, rad, 0, 2 * Math.PI);
     context.fill();
+  }
+
+  drawExit() {
+    const context = this.domElement.getContext('2d');
+    context.fillStyle = '#00ff88';
+    const x = this.maze.exitCol * this.wallLength;
+    const y = this.maze.exitRow * this.wallLength;
+    const padding = this.wallLength * 0.15;
+    context.fillRect(
+      x + padding,
+      y + padding,
+      this.wallLength - (padding * 2),
+      this.wallLength - (padding * 2),
+    );
   }
 }
 
