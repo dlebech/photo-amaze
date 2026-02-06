@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import Stats from 'stats.js';
 import Maze from './maze';
 import Player from './player';
@@ -53,16 +54,27 @@ loadingTexture.minFilter = THREE.LinearFilter;
  * Creates a single wall at the given coordinates.
  */
 const createWall = (x, z, direction) => {
+  // Reuse the same plane geometry for the walls.
+  // The walls actually consist of two planes that are merged together.
+  // This is done so textures can be added to each side without the
+  // texture being inverted.
   if (wallGeometry === null) {
-    wallGeometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
+    const geometry1 = new THREE.PlaneGeometry(wallWidth, wallHeight);
+    const geometry2 = new THREE.PlaneGeometry(wallWidth, wallHeight);
+
+    // Rotate the second plane so it faces the opposite direction.
+    geometry2.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.PI));
+
+    // Merge both planes into one geometry, using groups so each
+    // side can have its own material index.
+    wallGeometry = mergeGeometries([geometry1, geometry2], true);
   }
 
-  const material = new THREE.MeshLambertMaterial({
-    map: wallTexture,
-    side: THREE.DoubleSide,
-  });
+  // Create a material for each side of the wall.
+  const material1 = new THREE.MeshLambertMaterial({ map: wallTexture });
+  const material2 = new THREE.MeshLambertMaterial({ map: wallTexture });
 
-  const wall = new THREE.Mesh(wallGeometry, material);
+  const wall = new THREE.Mesh(wallGeometry, [material1, material2]);
 
   switch (direction) {
     case maze.DIRECTIONS.N:
@@ -79,8 +91,6 @@ const createWall = (x, z, direction) => {
       break;
     case maze.DIRECTIONS.E:
       // Rotate east and west surfaces 90 degrees.
-      // The walls are doublesided so it doesn't matter which way
-      // they are rotated.
       wall.rotation.y = Math.PI / 2;
       wall.position.z = z;
       wall.position.x = x + wallHalfWidth;
@@ -403,7 +413,8 @@ const animate = () => {
  */
 const addImageToWall = (image, mesh) => {
   // Add loading wall
-  mesh.material.map = loadingTexture;
+  mesh.material[0].map = loadingTexture;
+  mesh.material[1].map = loadingTexture;
 
   // Start loading the image.
   imgLoader.load(image.url, (img) => {
@@ -462,8 +473,9 @@ const addImageToWall = (image, mesh) => {
       image.texture.needsUpdate = true;
     }
 
-    // Update the wall.
-    mesh.material.map = image.texture;
+    // Update the wall on both sides.
+    mesh.material[0].map = image.texture;
+    mesh.material[1].map = image.texture;
   });
 };
 
