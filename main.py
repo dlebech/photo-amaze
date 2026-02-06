@@ -18,9 +18,8 @@ from flask import Flask, send_from_directory
 from google.appengine.api import wrap_wsgi_app
 
 from photoamaze import config
-from photoamaze.routes import bp as main_bp
+from photoamaze.routes import bp as main_bp, handle_http_exception
 from photoamaze.mail import bp as mail_bp
-from photoamaze.handlers import handle_http_exception
 
 # Setup Flickr API
 flickr_api.set_keys(api_key=config.Flickr.api_key,
