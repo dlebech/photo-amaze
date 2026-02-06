@@ -45,8 +45,6 @@
 </div>
 <div id="render-area"></div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/threejs/r84/three.min.js"></script>
-<script src="/js/libs/stats.min.js"></script>
 <script>
 {% if maze_id is defined %}
 window.imagesUrl = '{{ url_for("main.maze_image_list", maze_id=maze_id) }}';

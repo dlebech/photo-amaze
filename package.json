@@ -20,5 +20,9 @@
     "url": "https://github.com/user/photo-amaze.git"
   },
   "author": "David Volquartz Lebech",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "stats.js": "0.17.0",
+    "three": "0.182.0"
+  }
 }

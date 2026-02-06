@@ -1,36 +1,8 @@
-/* global THREE, Stats */
-
+import * as THREE from 'three';
+import Stats from 'stats.js';
 import Maze from './maze';
 import Player from './player';
 import MiniMap from './minimap';
-
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
- */
-class Detector {
-  static get canvas() {
-    return !!window.CanvasRenderingContext2D;
-  }
-
-  static get webgl() {
-    try {
-      const canvas = document.createElement('canvas');
-      return window.WebGLRenderingContext &&
-        (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
-    } catch (e) {
-      return false;
-    }
-  }
-
-  static get workers() {
-    return !!window.Worker;
-  }
-
-  static get fileapi() {
-    return window.File && window.FileReader && window.FileList && window.Blob;
-  }
-}
 
 // Representation of the maze and minimap.
 let maze = null;
@@ -69,8 +41,6 @@ let curCol = 0;
 // Whether or not the current maze is enabled.
 let enabled = false;
 
-let usingWebGL = true;
-
 // Image loader and loading texture placeholder.
 const imgLoader = new THREE.ImageLoader();
 const textureLoader = new THREE.TextureLoader();
@@ -83,49 +53,16 @@ loadingTexture.minFilter = THREE.LinearFilter;
  * Creates a single wall at the given coordinates.
  */
 const createWall = (x, z, direction) => {
-  // Reuse the same plane geometry for the walls.
-  // The walls actually consist of two planes that are merged together.
-  // This is done so textures can be added to each side without the
-  // texture being inverted.
   if (wallGeometry === null) {
-    // Create two planes.
-    let geometry;
-    let geometry2;
-
-    if (usingWebGL) {
-      geometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
-      geometry2 = new THREE.PlaneGeometry(wallWidth, wallHeight);
-    } else {
-      // If webgl is not present, use more wall segments.
-      geometry = new THREE.PlaneGeometry(wallWidth, wallHeight, 4, 4);
-      geometry2 = new THREE.PlaneGeometry(wallWidth, wallHeight, 4, 4);
-    }
-
-    // Rotate the second plane and merge the planes together.
-    geometry2.applyMatrix(new THREE.Matrix4().makeRotationY(Math.PI));
-    geometry.merge(geometry2);
-
-    // Set the material index to be different on each side.
-    // A plane geometry has two faces.
-    // XXX: Can we be sure about that forever?
-    geometry.faces[0].materialIndex = 0;
-    geometry.faces[1].materialIndex = 0;
-    geometry.faces[2].materialIndex = 1;
-    geometry.faces[3].materialIndex = 1;
-
-    wallGeometry = geometry;
+    wallGeometry = new THREE.PlaneGeometry(wallWidth, wallHeight);
   }
 
-  // Create a material for each side of the wall.
-  const material1 = new THREE.MeshLambertMaterial({ map: wallTexture });
-  const material2 = new THREE.MeshLambertMaterial({ map: wallTexture });
-  if (!usingWebGL) {
-    material1.overdraw = true;
-    material2.overdraw = true;
-  }
-  const materials = [material1, material2];
+  const material = new THREE.MeshLambertMaterial({
+    map: wallTexture,
+    side: THREE.DoubleSide,
+  });
 
-  const wall = new THREE.Mesh(wallGeometry, new THREE.MultiMaterial(materials));
+  const wall = new THREE.Mesh(wallGeometry, material);
 
   switch (direction) {
     case maze.DIRECTIONS.N:
@@ -305,21 +242,19 @@ const init3DMaze = () => {
   }
 
   // Create and add floor
-  if (usingWebGL) {
-    const width = maze.mazeGrid.length * wallWidth;
-    const geometry = new THREE.PlaneGeometry(width, width);
-    geometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+  const width = maze.mazeGrid.length * wallWidth;
+  const geometry = new THREE.PlaneGeometry(width, width);
+  geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
 
-    const txt = textureLoader.load('/img/floor.jpg');
-    txt.wrapS = THREE.RepeatWrapping;
-    txt.wrapT = THREE.RepeatWrapping;
-    txt.repeat.set(maze.mazeGrid.length, maze.mazeGrid.length);
-    const material = new THREE.MeshPhongMaterial({ map: txt });
+  const txt = textureLoader.load('/img/floor.jpg');
+  txt.wrapS = THREE.RepeatWrapping;
+  txt.wrapT = THREE.RepeatWrapping;
+  txt.repeat.set(maze.mazeGrid.length, maze.mazeGrid.length);
+  const material = new THREE.MeshPhongMaterial({ map: txt });
 
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set((width / 2) - wallHalfWidth, -wallHalfHeight, (width / 2) - wallHalfWidth);
-    scene.add(mesh);
-  }
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set((width / 2) - wallHalfWidth, -wallHalfHeight, (width / 2) - wallHalfWidth);
+  scene.add(mesh);
 };
 
 const initScene = (renderAreaId) => {
@@ -328,8 +263,7 @@ const initScene = (renderAreaId) => {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
 
-  if (usingWebGL) renderer = new THREE.WebGLRenderer();
-  else renderer = new THREE.CanvasRenderer();
+  renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   const renderarea = document.getElementById(renderAreaId);
@@ -376,8 +310,7 @@ const animate = () => {
  */
 const addImageToWall = (image, mesh) => {
   // Add loading wall
-  mesh.material.materials[0].map = loadingTexture;
-  mesh.material.materials[1].map = loadingTexture;
+  mesh.material.map = loadingTexture;
 
   // Start loading the image.
   imgLoader.load(image.url, (img) => {
@@ -436,9 +369,8 @@ const addImageToWall = (image, mesh) => {
       image.texture.needsUpdate = true;
     }
 
-    // Update the wall on both sides.
-    mesh.material.materials[0].map = image.texture;
-    mesh.material.materials[1].map = image.texture;
+    // Update the wall.
+    mesh.material.map = image.texture;
   });
 };
 
@@ -467,7 +399,7 @@ class PhotoMaze {
    * Return a boolean indicating whether the WebGL renderer is used or not.
    */
   static isWebGL() {
-    return usingWebGL;
+    return true;
   }
 
   /**
@@ -496,41 +428,33 @@ class PhotoMaze {
   }
 
   static toggleStats() {
-    // Stats for WebGL.
     if (stats) {
-      document.body.removeChild(stats.domElement);
-      stats.end();
+      document.body.removeChild(stats.dom);
       stats = null;
       return;
     }
 
     stats = new Stats();
-    stats.setMode(0);
+    stats.showPanel(0);
 
     // Align top-right
-    stats.domElement.style.position = 'fixed';
-    stats.domElement.style.right = '0px';
-    stats.domElement.style.top = '0px';
-    document.body.appendChild(stats.domElement);
+    stats.dom.style.position = 'fixed';
+    stats.dom.style.right = '0px';
+    stats.dom.style.top = '0px';
+    document.body.appendChild(stats.dom);
   }
 
   /**
    * Start sets up the maze and begins rendering.
    */
   static start(renderAreaId, length, width) {
-    // Determine whether or not to use webgl.
-    usingWebGL = Detector.webgl;
-
     if (animationId !== null) cancelAnimationFrame(animationId);
 
     // Initialize the basic scene elements.
     initScene(renderAreaId);
 
     // Create the maze.
-    // Webgl, ok for any length/width (almost)
-    if (usingWebGL) initMaze(length, width);
-    // Not WebGL, limit to 4 by 4.
-    else initMaze(4, 4);
+    initMaze(length, width);
 
     // Animate!
     animate();
