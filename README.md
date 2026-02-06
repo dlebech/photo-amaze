@@ -1,7 +1,7 @@
 # photo-amaze
 
-A 3D maze with walls made up of photos from Flickr or Instagram. Runs on Google
-App Engine with THREE.js as graphics library.
+A 3D maze with walls made up of photos from Flickr. Runs on Google
+App Engine (Python 3) with THREE.js as graphics library.
 
 View it [here](https://photo-amaze.appspot.com).
 
@@ -19,12 +19,14 @@ Used for the initial walls.
 
 ## Running it locally
 
-First install `gcloud` tools. Then ideally it should be this simple:
+First install `gcloud` tools and Node.js. Then:
 
-    $ cp app_sample.yml app.yml
+    $ cp app_sample.yaml app.yaml
+    $ python -m venv venv && source venv/bin/activate
+    $ pip install -r requirements.txt
     $ npm install
-    $ pip2 install -t lib -r requirements.txt
-    $ ./debug.sh
+    $ npm run build
+    $ python main.py
 
 ## History
 
@@ -32,8 +34,10 @@ The project was initially made in 2014 for a wedding as a "selfie-maze", but
 the code was never released on Github, because I started getting busy, and
 didn't have time to clean it up.
 
-Now, in 2017, I've updated it to use slightly fancier JS syntax and updated
-some other deprecated code that didn't work anymore as well as move hardcoded
-API secrets into environment variables. This explains why the commit history is
-very short, because I didn't want to have secrets in the commit history, so the
-project got a "fresh start" :-)
+In 2017, it was updated to use slightly fancier JS syntax and updated
+some other deprecated code, as well as move hardcoded API secrets into
+environment variables.
+
+In 2026, it was migrated from Python 2.7/webapp2 to Python 3/Flask,
+the build pipeline was updated from gulp/webpack to Vite, and dead
+Instagram/Facebook integrations were removed.

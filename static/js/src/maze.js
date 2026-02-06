@@ -67,6 +67,11 @@ class Maze {
     // Start at position 0, 0.
     carvePassage(0, 0, this.mazeGrid);
 
+    // Open exit passage at the far corner of the maze.
+    this.exitRow = rows - 1;
+    this.exitCol = cols - 1;
+    this.mazeGrid[this.exitRow][this.exitCol] |= this.DIRECTIONS.S;
+
     console.log(this.printMaze());
   }
 
@@ -96,4 +101,4 @@ class Maze {
   }
 }
 
-module.exports = Maze;
+export default Maze;

@@ -1,8 +1,10 @@
 # Ignore compiled Python files
 *.py[co]
+__pycache__/
 
 # Ignore the app.yaml, because secrets
 app.yaml
+app.yml
 
 # Ignore site confirmation
 googled*
@@ -11,3 +13,10 @@ googled*
 node_modules/
 dist/
 venv/
+lib/
+
+*.local.json
+
+.env
+
+data/

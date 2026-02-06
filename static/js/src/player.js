@@ -1,4 +1,4 @@
-/* global THREE */
+import * as THREE from 'three';
 
 class Utils {
   // http://stackoverflow.com/questions/14813902/three-js-get-the-direction-in-which-the-camera-is-looking
@@ -37,7 +37,7 @@ class Player {
     scene.add(this.yaw);
 
     // Set up the player's light source.
-    this.light = new THREE.PointLight(0xffffff, 2, 400);
+    this.light = new THREE.PointLight(0xffffff, 10000, 200);
     scene.add(this.light);
 
     // Set up the player's collision detector.
@@ -224,4 +224,4 @@ class Player {
   }
 }
 
-module.exports = Player;
+export default Player;

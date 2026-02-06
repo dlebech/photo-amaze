@@ -1,4 +1,4 @@
-const PhotoMaze = require('./photomaze');
+import PhotoMaze from './photomaze';
 
 // Initially empty image list.
 let images = [];
@@ -51,16 +51,11 @@ const fillAttribList = () => {
 };
 
 // Shows the overlay
-const overlay = (controls, sharing, copyright) => {
+const overlay = (controls, copyright) => {
   PhotoMaze.disable();
 
   if (controls) document.getElementById('controls').style.display = '';
   else document.getElementById('controls').style.display = 'none';
-
-  if (window.enableSharing) {
-    if (sharing) document.getElementById('sharing').style.display = '';
-    else document.getElementById('sharing').style.display = 'none';
-  }
 
   if (copyright) document.getElementById('copyright').style.display = '';
   else document.getElementById('copyright').style.display = 'none';
@@ -99,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Show overlay on escape key.
   window.addEventListener('keydown', (e) => {
     if (e.keyCode === 27) {
-      overlay(true, true, false);
+      overlay(true, false);
     }
   });
 
@@ -136,19 +131,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('settings-minimap').addEventListener('click', ev);
   document.getElementById('settings-minimap').addEventListener('touchstart', ev);
 
-  if (window.enableSharing) {
-    ev = () => overlay(false, true, false);
-    document.getElementById('settings-share').addEventListener('click', ev);
-    document.getElementById('settings-share').addEventListener('touchstart', ev);
-  }
-
-  ev = () => overlay(true, false, false);
+  ev = () => overlay(true, false);
   document.getElementById('settings-controls').addEventListener('click', ev);
   document.getElementById('settings-controls').addEventListener('touchstart', ev);
 
   ev = () => {
     fillAttribList();
-    overlay(false, false, true);
+    overlay(false, true);
   };
   document.getElementById('settings-copyright').addEventListener('click', ev);
   document.getElementById('settings-copyright').addEventListener('touchstart', ev);

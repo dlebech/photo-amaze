@@ -74,7 +74,7 @@
                 </a>
               </li>
               <li>
-                <a rel="nofollow" href="{{ uri_for('public-maze') }}?ft=mila&amp;fu=dlebech" class="btn btn-lg btn-default">
+                <a rel="nofollow" href="{{ url_for('main.public_maze') }}?ft=mila&amp;fu=dlebech" class="btn btn-lg btn-default">
                   <i class="fa fa-eye fa-fw"></i> Show an example
                 </a>
               </li>
@@ -136,7 +136,7 @@
                 </div>
                 <div id="private" class="panel-collapse collapse{{ ' in active' if private_error is defined else '' }}">
                   <div class="panel-body">
-                    <p>Create your own, unique maze and walk your photos. Connect with your Instagram or Flickr account later.</p>
+                    <p>Create your own, unique maze and walk your photos. Connect with your Flickr account later.</p>
                     {% if private_error is defined %}
                     <div class="alert alert-danger">{{ private_error }}</div>
                     {% endif %}
@@ -158,7 +158,7 @@
                         </div>
                       </div>
                       <button class="btn btn-default btn-lg" type="submit">Create</button>
-                      <span class="help-block">By creating a maze, you automatically approve of the <a href="{{ uri_for('terms') }}">terms</a>.</span>
+                      <span class="help-block">By creating a maze, you automatically approve of the <a href="{{ url_for('main.terms') }}">terms</a>.</span>
                     </form>
                   </div>
                 </div>
@@ -186,7 +186,6 @@
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="https://cdn.polyfill.io/v2/polyfill.js?features=es6"></script>
 <script src="/js/libs/jquery.easing.min.js"></script>
 <script src="/js/libs/grayscale.js"></script>
 <script src="/js/site.js"></script>

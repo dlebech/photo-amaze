@@ -18,7 +18,6 @@ from google.appengine.ext import ndb
 
 from photoamaze import config, models, auth
 
-EXTERNAL_INSTAGRAM = 'i'
 EXTERNAL_FLICKR = 'f'
 FLICKR_BUDDYICON_URL_TEMPLATE = ("https://farm{farm}.staticflickr.com/{server}/"
                                  "buddyicons/{nsid}.jpg")
@@ -41,7 +40,8 @@ def __prepare_search(s, remove_whitespace=False, error_message=None):
 
 
 def __format_external_url(external_id, url):
-    return '{};{};0'.format(external_id, base64.b64encode(url))
+    return '{};{};0'.format(external_id,
+                            base64.b64encode(url.encode()).decode())
 
 
 def __prepare_flickr_photos(photos, size):
@@ -61,7 +61,7 @@ def __prepare_flickr_photos(photos, size):
         name = photo.get('ownername') or owner or ''
         photo_url = FLICKR_PHOTO_URL.format(user_id=owner,
                                             photo_id=photo.get('id'))
-        attribution = u"'{}' by {}".format(title, name)
+        attribution = "'{}' by {}".format(title, name)
         license = flickr_license(photo.get('license', ''))
 
         # If there was an appropriate size, add the image to the list.
@@ -69,20 +69,6 @@ def __prepare_flickr_photos(photos, size):
             url = __format_external_url(EXTERNAL_FLICKR, url)
             img = models.LocalImage(url, title, attribution=attribution,
                                     external_url=photo_url, license=license)
-            imagelist.append(img)
-    return imagelist
-
-
-def __prepare_instagram_media(media_list, size=1024):
-    imagelist = []
-    for media in media_list:
-        if media.type == 'image':
-            media_url = media.get_standard_resolution_url()
-            if size < 512:
-                media_url = media.get_low_resolution_url()
-            url = __format_external_url(EXTERNAL_INSTAGRAM, media_url)
-            msg = media.caption.text if media.caption else ''
-            img = models.LocalImage(url, msg)
             imagelist.append(img)
     return imagelist
 
@@ -107,7 +93,7 @@ def __prepare_internal_images_for_maze(maze, size, page, page_size):
 
     image_list = []
     for entity in entities:
-        image_key = 'b;{};{}'.format(entity.key.urlsafe(), size)
+        image_key = 'b;{};{}'.format(entity.key.urlsafe().decode(), size)
         img = models.LocalImage(image_key, entity.message)
         image_list.append(img)
 
@@ -148,48 +134,6 @@ def __prepare_flickr_images_for_maze(maze, size, page, page_size):
     raise ndb.Return(list(image_set))
 
 
-@ndb.tasklet
-def __prepare_instagram_images_for_maze(maze, size, page, page_size):
-    api = None
-
-    # Check if user specific API calls are possible.
-    if maze.instagram.user_access:
-        user_access = yield maze.instagram.user_access.get_async()
-        if user_access:
-            api = auth.init_instagram(access_token=user_access.access_token)
-
-    if not api:
-        raise ndb.Return([])
-
-    image_set = set()
-
-    try:
-        if maze.instagram.tag:
-            images = instagram_search_tag(maze.instagram.tag, api)
-            image_set.update(images)
-
-        if maze.instagram.include_recent:
-            recent_media, next_ = api.user_recent_media()
-            image_set.update(__prepare_instagram_media(recent_media))
-
-        if maze.instagram.include_feed:
-            recent_media, next_ = api.user_media_feed()
-            image_set.update(__prepare_instagram_media(recent_media))
-    except Exception as e:
-        # For now, just log everything.
-        logging.exception(e)
-
-    raise ndb.Return(list(image_set))
-
-
-def instagram_search_tag(tag, api, size=1024):
-    tag = __prepare_search(tag, True, 'Tag is invalid')
-    medias, _next = api.tag_recent_media(20, None, tag)
-    images = set()
-    images.update(__prepare_instagram_media(medias, size=size))
-    return list(images)
-
-
 def flickr_search(tags, user, auth=None, size=1024, page=1, page_size=30):
     tags = __prepare_search(tags)
     user = __prepare_search(user)
@@ -228,7 +172,7 @@ def flickr_buddy_icon(person):
                 farm=person['iconfarm'],
                 server=person['iconserver'],
                 nsid=person['nsid'])
-    except:
+    except Exception:
         pass
     person['buddyiconurl'] = buddyicon
 
@@ -265,11 +209,9 @@ def prepare_images_for_maze(maze, page=1, page_size=20, size=0):
         internal = __prepare_internal_images_for_maze(maze, size,
                                                       page, page_size)
         flickr = __prepare_flickr_images_for_maze(maze, size, page, page_size)
-        instagram = __prepare_instagram_images_for_maze(maze, size,
-                                                        page, page_size)
 
-        internal, flickr, instagram = yield internal, flickr, instagram
-        image_list = internal + flickr + instagram
+        internal, flickr = yield internal, flickr
+        image_list = internal + flickr
         memcache.set(cache_key, image_list, time=config.MEMCACHE_TIME)
 
     raise ndb.Return(image_list)

@@ -28,16 +28,16 @@ class _ReadOnlyMetaClass(type):
     @property
     def values(self):
         """Return all defined values for this class."""
-        return self.__dict__.values()
+        return [v for v in self.__dict__.values() if isinstance(v, str)]
 
     def __str__(self):
         """Return the name of the class."""
         return self.__name__.lower()
 
 
-class ReadOnly(object):
+class ReadOnly(object, metaclass=_ReadOnlyMetaClass):
     """A class where all class attributes are read-only."""
-    __metaclass__ = _ReadOnlyMetaClass
+    pass
 
 
 _html_escape_table = {
